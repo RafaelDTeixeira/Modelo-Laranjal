@@ -14,6 +14,7 @@ Este projeto implementa um modelo hidráulico da rede de distribuição de água
 - Utiliza o simulador **WNTR** para simular eventos de ruptura e gerar dados de pressão e vazão em diferentes nós da rede.
 - Realiza múltiplas simulações configurando rupturas em diferentes tubulações e horários aleatórios.
 - Armazena os dados gerados no banco de dados SQLite `dados_rupturas.db`.
+- Link do Dataset para teste: https://drive.google.com/file/d/1OPa4qvw17u95eBYx0rJGDxWf7Gf7PYMN/view?usp=sharing.
 
 ### Análise e Treinamento do Modelo (`analise_dataset.py`)
 - Carrega e processa o dataset gerado, aplicando transformações temporais e codificação de variáveis categóricas.
