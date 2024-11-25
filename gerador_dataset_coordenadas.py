@@ -22,7 +22,6 @@ with open(original_inp_file, 'r', encoding='latin-1') as f:
 with open(temp_inp_file, 'w', encoding='utf-8', errors='replace') as temp_file:
     temp_file.write(inp_file_content)
 
-
 # Configuração do banco de dados SQLite
 db_path = 'dados_rupturas.db'  # Caminho do banco de dados SQLite
 
@@ -43,6 +42,15 @@ cursor.execute('''
     )
 ''')
 
+# Parâmetros fixos de simulação
+total_duration = 24 * 3600  # Duração total da simulação: 24 horas
+minimum_pressure = 5.0       # Pressão mínima para PDD
+required_pressure = 20.0      # Pressão necessária para PDD
+min_pipe_diam = 0.3048        # Diâmetro mínimo da tubulação a ser incluída na análise (12 polegadas)
+
+# Lista para armazenar todos os dados das simulações antes de salvar no banco de dados
+all_simulation_data = []
+
 # Função para executar uma simulação de ruptura e coletar dados
 def simular_ruptura(wn, start_time, pipe_name):
     # Configurar controle de fechamento da tubulação
@@ -60,6 +68,7 @@ def simular_ruptura(wn, start_time, pipe_name):
     sim_pressure = sim_results.node['pressure']
     sim_demand = sim_results.node['demand']
     node_coords = wn.query_node_attribute('coordinates')  # Obter coordenadas dos nós
+
     
     # Identificar nós impactados pela ruptura
     sim_pressure_below_pmin = sim_pressure.columns[(sim_pressure < minimum_pressure).any()]
@@ -76,8 +85,8 @@ def simular_ruptura(wn, start_time, pipe_name):
             demand = sim_demand.at[time, node]
             quebrado_ou_vazamento = 1 if node in impacted_nodes else 0
             tempo_str = (datetime.now() + pd.to_timedelta(time, unit='s')).strftime('%Y-%m-%d %H:%M:%S')
-
-            # Obter coordenadas do nó
+            
+        # Obter coordenadas do nó
             x_coord, y_coord = node_coords[node]
             
             # Armazenar dados no banco de dados
@@ -107,6 +116,7 @@ for sim in range(num_simulacoes):
     for pipe_name in pipes_to_break:
         try:
             simular_ruptura(wn, start_time, pipe_name)
+        
         except Exception as e:
             print(f"Erro na simulação da tubulação {pipe_name}: {e}")
 
